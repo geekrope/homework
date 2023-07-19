@@ -209,34 +209,27 @@ namespace Homework1
                 prizes[index] = int.Parse(inputSplitted[index]);
             }
 
-            var output = "";
+            var max = Math.Max(prizes[0], prizes[1]);
+            var previousMax = Math.Min(prizes[0], prizes[1]);
 
-            for (int k = 2; k <= n; k++)
+            for (int k = 2; k < n; k++)
             {
-                var max = FindMaxUpToK(prizes, k, -1);
-                var previousMax = FindMaxUpToK(prizes, k, Array.IndexOf(prizes, max));
+                Console.Write(previousMax + " ");
 
-                output += previousMax + " ";
-            }
+                var number = prizes[k];
 
-            Console.WriteLine(output);
-        }
-
-        public static int FindMaxUpToK(int[] numbers, int k, int exclude)
-        {
-            var max = -1;
-
-            for (int index = 0; index < k; index++)
-            {
-                var number = numbers[index];
-
-                if (number > max && index != exclude)
+                if (number > max)
                 {
+                    previousMax = max;
                     max = number;
+                }
+                else if(number > previousMax)
+                {
+                    previousMax = number;
                 }
             }
 
-            return max;
+            Console.Write(previousMax);
         }
 
         public static void Main(string[] args)
