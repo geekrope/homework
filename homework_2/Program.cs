@@ -25,7 +25,7 @@ namespace Homework2
         {
             return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
         }
-        private static int GetDaysCount(int month, int year)
+        private static int GetMonthDaysCount(int month, int year)
         {
             switch (month)
             {
@@ -55,6 +55,21 @@ namespace Homework2
                     throw new ArgumentException("Not a month number");
             }
         }
+        private static int GetYearDaysCount(int year)
+        {
+            return IsLeapYear(year) ? 366 : 365;
+        }
+        private static int DayOfYear(Date date)
+        {
+            var output = 0;
+
+            for (int month = 1; month < date.Month; month++)
+            {
+                output += GetMonthDaysCount(month, date.Year);
+            }
+
+            return output + date.Day;
+        }
 
         public Date GetTomorrow()
         {
@@ -79,11 +94,11 @@ namespace Homework2
             var month = date.Month;
             var year = date.Year;
 
-            while (day + days > GetDaysCount(month, year))
+            while (day + days > GetMonthDaysCount(month, year))
             {
                 var fitsYear = (month + 1) <= monthsCount;
 
-                days -= GetDaysCount(month, year);
+                days -= GetMonthDaysCount(month, year);
 
                 month = fitsYear ? month + 1 : 1;
                 year = fitsYear ? year : year + 1;
@@ -106,7 +121,7 @@ namespace Homework2
                 month = fitsYear ? month - 1 : monthsCount;
                 year = fitsYear ? year : year - 1;
 
-                days -= GetDaysCount(month, year);
+                days -= GetMonthDaysCount(month, year);
             }
 
             day -= days;
@@ -115,17 +130,28 @@ namespace Homework2
         }
         public static int operator -(Date date1, Date date2)
         {
-            return 0;
+            var difference = DayOfYear(date1);
+
+            for (int year = date1.Year - 1; year > date2.Year; year--)
+            {
+                difference += GetYearDaysCount(year);
+            }
+
+            difference += GetYearDaysCount(date2.Year) - DayOfYear(date2);
+
+            return difference;
         }
     }
     public static class Program
     {
         public static void Main(string[] args)
         {
-            var date = new Date(30, 9, 2023);
+            var date = new Date(1, 9, 2023);
 
             (date + 1).Print();
             date.GetYesterday().Print();
+
+            Console.WriteLine(new Date(21, 12, 2023) - new Date(30, 7, 2019));
         }
     }
 }
