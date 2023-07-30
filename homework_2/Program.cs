@@ -59,7 +59,7 @@ namespace Homework2
         {
             return IsLeapYear(year) ? 366 : 365;
         }
-        private static int DayOfYear(Date date)
+        private static int GetDayOfYear(Date date)
         {
             var output = 0;
 
@@ -130,14 +130,14 @@ namespace Homework2
         }
         public static int operator -(Date date1, Date date2)
         {
-            var difference = DayOfYear(date1);
+            var difference = GetDayOfYear(date1);
 
             for (int year = date1.Year - 1; year > date2.Year; year--)
             {
                 difference += GetYearDaysCount(year);
             }
 
-            difference += GetYearDaysCount(date2.Year) - DayOfYear(date2);
+            difference += GetYearDaysCount(date2.Year) - GetDayOfYear(date2);
 
             return difference;
         }
