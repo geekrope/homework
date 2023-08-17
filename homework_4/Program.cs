@@ -126,7 +126,10 @@ namespace Homework4
                     }
                 }
 
-                Console.WriteLine((firstEntry + 1) + " " + (secondEntry + 1));
+                firstEntry = (array1[firstEntry] == element) ? (firstEntry + 1) : 0;
+                secondEntry = (array1[secondEntry] == element) ? (secondEntry + 1) : 0;
+
+                Console.WriteLine(firstEntry + " " + secondEntry);
             }
         }
     }
