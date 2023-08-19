@@ -91,7 +91,7 @@ namespace Homework4
             }
         }
 
-        public static void Main(string[] args)
+        public static void D()
         {
             var (array1, array2) = GetTwoArrays();
 
@@ -131,6 +131,11 @@ namespace Homework4
 
                 Console.WriteLine(firstEntry + " " + secondEntry);
             }
+        }
+
+        public static void Main(string[] args)
+        {
+            D();
         }
     }
 }
