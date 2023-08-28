@@ -40,7 +40,7 @@ namespace Homework5
             Console.WriteLine(max);
         }
 
-        https://acmp.ru/asp/do/index.asp?main=task&id_course=3&id_section=24&id_topic=164&id_problem=1066
+        //https://acmp.ru/asp/do/index.asp?main=task&id_course=3&id_section=24&id_topic=164&id_problem=1066
         public static void Task2()
         {
             var input = Console.ReadLine().Split();
