@@ -7,7 +7,7 @@ namespace Homework5
     public class Program
     {
         //https://acmp.ru/asp/do/index.asp?main=task&id_course=3&id_section=24&id_topic=112&id_problem=687
-        public static void Task1()
+        public static void Task1() //wrong answer
         {
             var input = Console.ReadLine().Split();
 
@@ -41,7 +41,7 @@ namespace Homework5
         }
 
         //https://acmp.ru/asp/do/index.asp?main=task&id_course=3&id_section=24&id_topic=164&id_problem=1066
-        public static void Task2()
+        public static void Task2()  //solved
         {
             var input = Console.ReadLine().Split();
 
@@ -99,7 +99,7 @@ namespace Homework5
         }
 
         //https://informatics.msk.ru/mod/statements/view.php?id=3516#1
-        public static void Task3()
+        public static void Task3() //xz
         {
             var arg = double.Parse(Console.ReadLine());
             var n = int.Parse(Console.ReadLine());
@@ -107,9 +107,67 @@ namespace Homework5
             Console.WriteLine(Root(arg, n, 1e-6));
         }
 
+        //https://codeforces.com/problemset/problem/978/C
+        public static void Task5() //solved
+        {
+            var input = Console.ReadLine().Split();
+
+            var n = long.Parse(input[0]);
+            var m = long.Parse(input[1]);
+
+            var apartsRaw = Console.ReadLine().Split();
+            var aparts = new long[apartsRaw.Length];
+
+            for (int index = 0; index < apartsRaw.Length; index++)
+            {
+                aparts[index] = long.Parse(apartsRaw[index]);
+            }
+
+            var lettersRaw = Console.ReadLine().Split();
+            var letters = new long[lettersRaw.Length];
+
+            for (int index = 0; index < lettersRaw.Length; index++)
+            {
+                letters[index] = long.Parse(lettersRaw[index]);
+            }
+
+            var letterNumbersPerApart = new long[aparts.Length + 1]; // 1) apartments 0, 1, 2, 3 ...
+            letterNumbersPerApart[1] = 1;
+
+            for (int index = 0; index < aparts.Length; index++)
+            {
+                letterNumbersPerApart[index + 1] = letterNumbersPerApart[index] + aparts[index];
+            }
+
+            foreach (var letter in letters)
+            {
+                long left = 0;
+                long right = aparts.Length + 1;
+                long mid = (left + right) / 2;
+
+                while (left + 1 != right)
+                {
+                    // 2) get letter numbers to mid apartment without including mid apartment 
+                    if (letterNumbersPerApart[mid - 1] < letter) 
+                    {
+                        left = mid;
+                    }
+                    else
+                    {
+                        right = mid;
+                    }
+
+                    mid = (left + right) / 2;
+                }
+
+                // 3) same as 2
+                Console.WriteLine(left + " " + Math.Abs(letter - letterNumbersPerApart[left - 1]));
+            }
+        }
+
         public static void Main(string[] args)
         {
-            
+            Task5();
         }
     }
 }
