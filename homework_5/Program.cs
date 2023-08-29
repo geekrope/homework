@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32.SafeHandles;
 using System;
+using System.Net;
 using System.Runtime.CompilerServices;
 
 namespace Homework5
@@ -99,12 +100,61 @@ namespace Homework5
         }
 
         //https://informatics.msk.ru/mod/statements/view.php?id=3516#1
-        public static void Task3() //xz
+        public static void Task3() //xz scoree vsego solved
         {
             var arg = double.Parse(Console.ReadLine());
             var n = int.Parse(Console.ReadLine());
 
             Console.WriteLine(Root(arg, n, 1e-6));
+        }
+
+        //https://informatics.msk.ru/mod/statements/view.php?id=1966&chapterid=1#1
+        public static void Task4() // xz, system doesn't accept code
+        {
+            var input = Console.ReadLine().Split();
+
+            var N = int.Parse(input[0]);
+            var K = int.Parse(input[1]);
+
+            var spotsRaw = Console.ReadLine().Split();
+            var spots = new int[spotsRaw.Length];
+
+            for (int index = 0; index < spotsRaw.Length; index++)
+            {
+                spots[index] = int.Parse(spotsRaw[index]);
+            }
+
+            var min = 0;
+            var max = spots[spots.Length - 1] - spots[0];
+            var dist = (min + max) / 2;
+
+            while (min + 1 != max)
+            {
+                var placed = 1;
+                var lastSpot = 0;
+
+                for (int index = 1; index < spots.Length; index++)
+                {
+                    if (spots[index] - spots[lastSpot] >= dist)
+                    {
+                        placed++;
+                        lastSpot = index;
+                    }
+                }
+
+                if (placed < K)
+                {
+                    max = dist;
+                }
+                else
+                {
+                    min = dist;
+                }
+
+                dist = (min + max) / 2;
+            }
+
+            Console.WriteLine(min);
         }
 
         //https://codeforces.com/problemset/problem/978/C
@@ -148,7 +198,7 @@ namespace Homework5
                 while (left + 1 != right)
                 {
                     // 2) get letter numbers to mid apartment without including mid apartment 
-                    if (letterNumbersPerApart[mid - 1] < letter) 
+                    if (letterNumbersPerApart[mid - 1] < letter)
                     {
                         left = mid;
                     }
@@ -167,7 +217,7 @@ namespace Homework5
 
         public static void Main(string[] args)
         {
-            Task5();
+            Task4();
         }
     }
 }
