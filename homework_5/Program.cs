@@ -8,7 +8,7 @@ namespace Homework5
     public class Program
     {
         //https://acmp.ru/asp/do/index.asp?main=task&id_course=3&id_section=24&id_topic=112&id_problem=687
-        public static void Task1() //wrong answer
+        public static void Task1() //wrong answer test 33
         {
             var input = Console.ReadLine().Split();
 
