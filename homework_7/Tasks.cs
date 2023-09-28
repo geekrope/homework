@@ -1,8 +1,9 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using homework_7;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Homework5
 {
-    public class Program
+    public class Tasks
     {
         public static int Gcd(int a, int b)
         {
@@ -234,7 +235,19 @@ namespace Homework5
 
         public static void Main(string[] args)
         {
-            H();
+            List<Profile> profiles = new List<Profile>
+            {
+                new Vacancy("C# разработчик", 100000),
+                new Vacancy("Python разработчик", 90000),
+                new Vacancy("C++ разработчик", 110000),
+                new Resume("C# разработчик", 4),
+                new Resume("C++ разработчик", 1),
+            };
+
+            foreach (var profile in profiles)
+            {
+                Console.WriteLine(profile.Describe());
+            }
         }
     }
 }
