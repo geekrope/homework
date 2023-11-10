@@ -185,9 +185,53 @@ namespace homework_9
 
             Console.WriteLine(GetAllPossibleRoutesE2(new Point(n - 1, m - 1), board));
         }
+        private static int GetAllPossibleRoutesF2(Point point, Dictionary<Point, int> board, int width, int height)
+        {
+            if (board.ContainsKey(point))
+            {
+                return board[point];
+            }
+            else
+            {
+                var count = 0;
+
+                if (point.x - 1 >= 0 && point.y - 2 >= 0)
+                {
+                    count += GetAllPossibleRoutesF2(new Point(point.x - 1, point.y - 2), board, width, height);
+                }
+                if (point.x - 2 >= 0 && point.y - 1 >= 0)
+                {
+                    count += GetAllPossibleRoutesF2(new Point(point.x - 2, point.y - 1), board, width, height);
+                }
+                if (point.x + 1 < width && point.y - 2 >= 0)
+                {
+                    count += GetAllPossibleRoutesF2(new Point(point.x + 1, point.y - 2), board, width, height);
+                }
+                if (point.x - 2 >= 0 && point.y + 1 < height)
+                {
+                    count += GetAllPossibleRoutesF2(new Point(point.x - 2, point.y + 1), board, width, height);
+                }
+
+                board.Add(point, count);
+
+                return count;
+            }
+        }
+        private static void TaskF2()
+        {
+            var input = Console.ReadLine().Split();
+            var n = int.Parse(input[0]);
+            var m = int.Parse(input[1]);
+
+            var board = new Dictionary<Point, int>();
+            board.Add(new Point(0, 0), 1);
+
+            Console.WriteLine(GetAllPossibleRoutesF2(new Point(n - 1, m - 1), board, n, m));
+        }
+
         public static void Main(string[] args)
         {
-            TaskE2();
+            TaskF2();
         }
     }
 }
