@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection.Metadata;
 
 namespace homework_9
 {
-    public record class Sequence(int value, int sequence);
+    public record struct Point(int x, int y);
     public class Program
     {
         private static void TaskA()
@@ -91,9 +93,101 @@ namespace homework_9
 
             Console.WriteLine(array[array.Length - 1]);
         }
+
+        private static void TaskA2()
+        {
+            var input = Console.ReadLine().Split();
+            var n = int.Parse(input[0]);
+            var m = int.Parse(input[1]);
+            var cells = new int[n + 1, m + 1];
+
+            cells[1, 1] = 1;
+
+            for (int x = 1; x <= n; x++)
+            {
+                for (int y = 1; y <= m; y++)
+                {
+                    var count = 0;
+
+                    if (!(x == 1 && y == 1))
+                    {
+                        if (x - 1 >= 1)
+                        {
+                            count += cells[x - 1, y];
+                        }
+                        if (y - 1 >= 1)
+                        {
+                            count += cells[x, y - 1];
+                        }
+
+                        cells[x, y] = count;
+                    }
+                }
+            }
+
+            Console.WriteLine(cells[n, m]);
+        }
+        private static void TaskB2()
+        {
+            var lastRow = new List<int>() { 1 };
+            var currentRow = new List<int>() { 1 };
+            var rows = int.Parse(Console.ReadLine());
+
+            for (int row = 0; row < rows; row++)
+            {
+                for (int i = 1; i < lastRow.Count; i++)
+                {
+                    currentRow.Add(lastRow[i] + lastRow[i - 1]);
+                }
+
+                currentRow.Add(1);
+                Console.WriteLine(String.Join(' ', currentRow));
+                lastRow = currentRow;
+                currentRow = new List<int>() { 1 };
+            }
+        }
+        private static void TaskC2()
+        {
+            throw new NotImplementedException("Solved in class");
+        }
+        private static int GetAllPossibleRoutesE2(Point point, Dictionary<Point, int> board)
+        {
+            if (board.ContainsKey(point))
+            {
+                return board[point];
+            }
+            else
+            {
+                var count = 0;
+
+                if (point.x - 1 >= 0 && point.y - 2 >= 0)
+                {
+                    count += GetAllPossibleRoutesE2(new Point(point.x - 1, point.y - 2), board);
+                }
+                if (point.x - 2 >= 0 && point.y - 1 >= 0)
+                {
+                    count += GetAllPossibleRoutesE2(new Point(point.x - 2, point.y - 1), board);
+                }
+
+                board.Add(point, count);
+
+                return count;
+            }
+        }
+        private static void TaskE2()
+        {
+            var input = Console.ReadLine().Split();
+            var n = int.Parse(input[0]);
+            var m = int.Parse(input[1]);
+
+            var board = new Dictionary<Point, int>();
+            board.Add(new Point(0, 0), 1);
+
+            Console.WriteLine(GetAllPossibleRoutesE2(new Point(n - 1, m - 1), board));
+        }
         public static void Main(string[] args)
         {
-            TaskF();
+            TaskE2();
         }
     }
 }
