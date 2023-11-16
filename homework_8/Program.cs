@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace GeniusFool
 {
@@ -34,9 +36,9 @@ namespace GeniusFool
         {
             get => name;
         }
-        public string Score
+        public int Score
         {
-            get => name;
+            get => score;
         }
 
         public void AddPoints(int points)
@@ -55,6 +57,11 @@ namespace GeniusFool
         public Player(string name)
         {
             this.name = name;
+        }
+        public Player(string name, int score)
+        {
+            this.name = name;
+            this.score = score;
         }
     }
 
@@ -80,6 +87,7 @@ namespace GeniusFool
     {
         private Question[] questions;
         private Player? player;
+        private Storage memento;
         private ConsoleBridge console;
         private int[] order;
         private string[] diagnoses;
@@ -189,6 +197,17 @@ namespace GeniusFool
                     player?.AddPoints(question.GetPoints(answer));
                 }
 
+                PrintMessage("previous attempts");
+                foreach (var result in memento.LoadResult())
+                {
+                    PrintMessage($"{result.Name} {result.Score}");
+                }
+
+                if (player != null)
+                {
+                    memento.SaveResult(player);
+                }
+
                 PrintMessage($"{player?.Name} your diagnosis: {player?.GetDiagnosis(diagnoses, questions.Length)}, score:{player.Score}");
                 PrintMessage("do you want to play once again/");
                 player?.ResetScore();
@@ -196,13 +215,54 @@ namespace GeniusFool
             }
         }
 
-        public Playground(Question[] questions, string[] diagnoses, ConsoleBridge console)
+        public Playground(Question[] questions, string[] diagnoses, ConsoleBridge console, string fileName)
         {
             this.questions = questions;
             this.order = SequentialOrder();
+            this.memento = new Storage(fileName);
             this.console = console;
 
             this.diagnoses = diagnoses;
+        }
+    }
+
+    public class Storage
+    {
+        private string _fileName;
+
+        public void SaveResult(Player player)
+        {
+            using (var file = new StreamWriter(_fileName))
+            {
+                file.WriteLine($"{player.Name} {player.Score}\n");
+                file.Close();
+            }
+        }
+        public Player[] LoadResult()
+        {
+            var players = new List<Player>();
+
+            using (var file = new StreamReader(_fileName))
+            {
+                while (!file.EndOfStream)
+                {
+                    var raw = file.ReadLine()?.Split(' ',StringSplitOptions.RemoveEmptyEntries);
+
+                    if (raw != null && raw.Length > 0)
+                    {
+                        players.Add(new Player(raw[0], int.Parse(raw[1])));
+                    }
+                }
+
+                file.Close();
+            }
+
+            return players.ToArray();
+        }
+
+        public Storage(string fileName)
+        {
+            _fileName = fileName;
         }
     }
 
@@ -211,7 +271,7 @@ namespace GeniusFool
         public static void Main(string[] args)
         {
             var consoleImplementation = new CSharpConsole();
-            var playground = new Playground(new Question[] { new Question("2+2", "4", consoleImplementation), new Question("0?", "0", consoleImplementation), new Question("11 v kvadrate", "121", consoleImplementation) }, new string[] { "nol ballov", "lox", "idiot", "geniy" }, consoleImplementation);
+            var playground = new Playground(new Question[] { new Question("2+2", "4", consoleImplementation), new Question("0?", "0", consoleImplementation), new Question("11 v kvadrate", "121", consoleImplementation) }, new string[] { "nol ballov", "lox", "idiot", "geniy" }, consoleImplementation, "res.txt");
             playground.Launch();
         }
     }
