@@ -86,7 +86,6 @@ namespace homework_10
                 var z = y + x;
                 var c = lcm(a, b);
 
-
                 Array.Sort(p);
 
                 var left = -1;
