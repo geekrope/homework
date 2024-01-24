@@ -46,7 +46,7 @@ namespace homework_11
             d[0] = nails[1] - nails[0];
             d[1] = nails[2] - nails[0];
 
-            for (int i = 2; i < nails.Length; i++)
+            for (int i = 3; i < nails.Length; i++)
             {
                 d[i] = Math.Min(d[i - 2], d[i - 1]) + nails[i] - nails[i - 1];
             }
@@ -129,7 +129,7 @@ namespace homework_11
         }
         public static void Main(string[] args)
         {
-            B2();
+            B();
         }
     }
 }
