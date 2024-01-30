@@ -3,72 +3,172 @@ using System.Collections.Generic;
 
 public class Program
 {
-    public static HashSet<int> DFS(List<int>[] joints, HashSet<int> cameAcross, int startingVertex, Action<int> action)
+    public static HashSet<int> DFSRecursive(List<int>[] connections, HashSet<int> used, int startingVertex, Action<int> action)
     {
-        if (!cameAcross.Contains(startingVertex))
+        if (!used.Contains(startingVertex))
         {
-            cameAcross.Add(startingVertex);
+            used.Add(startingVertex);
 
-            foreach (var joint in joints[startingVertex])
+            foreach (var connection in connections[startingVertex])
             {
-                DFS(joints, cameAcross, joint, action);
+                DFSRecursive(connections, used, connection, action);
             }
 
             action(startingVertex);
         }
 
-        return cameAcross;
+        return used;
     }
-    public static List<List<int>> FindComponents(List<int>[] joints)
+    public static HashSet<int> DFS(List<int>[] connections, int startingVertex, Action<int> action)
     {
-        HashSet<int> cameAcross = new HashSet<int>();
+        var used = new HashSet<int>();
+        var suspended = new Stack<int>();
+
+        suspended.Push(startingVertex);
+        used.Add(startingVertex);
+
+        while (suspended.Count > 0)
+        {
+            var currentVertex = suspended.Pop();
+
+            foreach (var connection in connections[currentVertex])
+            {
+                if (!used.Contains(connection))
+                {
+                    suspended.Push(connection);
+                    used.Add(connection);
+                }
+            }
+
+            action(currentVertex);
+        }
+
+        return used;
+    }
+    public static List<List<int>> FindComponents(List<int>[] connections)
+    {
+        HashSet<int> used = new HashSet<int>();
         List<List<int>> components = new List<List<int>>();
 
-        while (cameAcross.Count != joints.Length)
+        while (used.Count != connections.Length)
         {
             var component = new List<int>();
             var startingVertex = -1;
 
-            for (int i = 0; i < joints.Length; i++)
+            for (int i = 0; i < connections.Length; i++)
             {
-                if (!cameAcross.Contains(i))
+                if (!used.Contains(i))
                 {
                     startingVertex = i;
                     break;
                 }
             }
 
-            DFS(joints, cameAcross, startingVertex, (int vertex) => { component.Add(vertex); });
+            used.UnionWith(DFS(connections, startingVertex, (int vertex) => { component.Add(vertex); }));
 
             components.Add(component);
         }
 
         return components;
     }
-    public static void E()
+    public static bool IsSeparable(List<int>[] connections)
     {
-        var inp = Console.ReadLine().Split();
+        int[] colors = new int[connections.Length];
+        var used = new HashSet<int>();
+        var suspended = new Stack<int>();
+
+        while (used.Count < connections.Length)
+        {
+            var startingVertex = -1;
+            for (int i = 0; i < connections.Length; i++)
+            {
+                if (!used.Contains(i))
+                {
+                    startingVertex = i;
+                    break;
+                }
+            }
+
+            colors[startingVertex] = 1;
+            suspended.Push(startingVertex);
+            used.Add(startingVertex);
+
+            while (suspended.Count > 0)
+            {
+                var currentVertex = suspended.Pop();
+
+                foreach (var connection in connections[currentVertex])
+                {
+                    if (colors[connection] == 0)
+                    {
+                        colors[connection] = colors[currentVertex] == 1 ? 2 : 1;
+                    }
+                    if (colors[connection] != 0 && colors[connection] == colors[currentVertex])
+                    {
+                        return false;
+                    }
+
+                    if (!used.Contains(connection))
+                    {
+                        suspended.Push(connection);
+                        used.Add(connection);
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public static void D()
+    {
+        var inp = Console.ReadLine().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
         var n = int.Parse(inp[0]);
         var m = int.Parse(inp[1]);
 
-        List<int>[] joints = new List<int>[n];
+        List<int>[] connections = new List<int>[n];
 
         for (int i = 0; i < n; i++)
         {
-            joints[i] = new List<int>();
+            connections[i] = new List<int>();
         }
 
         for (int i = 0; i < m; i++)
         {
-            var joint = Console.ReadLine().Split();
-            var first = int.Parse(joint[0]) - 1;
-            var second = int.Parse(joint[1]) - 1;
+            var connection = Console.ReadLine().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+            var first = int.Parse(connection[0]) - 1;
+            var second = int.Parse(connection[1]) - 1;
 
-            joints[first].Add(second);
-            joints[second].Add(first);
+            connections[first].Add(second);
+            connections[second].Add(first);
         }
 
-        var comps = FindComponents(joints);
+        Console.WriteLine(IsSeparable(connections) ? "YES" : "NO");
+    }
+    public static void E()
+    {
+        var inp = Console.ReadLine().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+        var n = int.Parse(inp[0]);
+        var m = int.Parse(inp[1]);
+
+        List<int>[] connections = new List<int>[n];
+
+        for (int i = 0; i < n; i++)
+        {
+            connections[i] = new List<int>();
+        }
+
+        for (int i = 0; i < m; i++)
+        {
+            var connection = Console.ReadLine().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+            var first = int.Parse(connection[0]) - 1;
+            var second = int.Parse(connection[1]) - 1;
+
+            connections[first].Add(second);
+            connections[second].Add(first);
+        }
+
+        var comps = FindComponents(connections);
 
         Console.WriteLine(comps.Count);
 
@@ -88,6 +188,6 @@ public class Program
     }
     public static void Main(string[] args)
     {
-        E();
+
     }
 }
