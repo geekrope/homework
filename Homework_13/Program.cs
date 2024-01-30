@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 public class Program
 {
@@ -19,7 +20,7 @@ public class Program
 
         return used;
     }
-    public static HashSet<int> DFS(List<int>[] connections, int startingVertex, Action<int> action)
+    public static IEnumerable<int> DFS(List<int>[] connections, int startingVertex)
     {
         var used = new HashSet<int>();
         var suspended = new Stack<int>();
@@ -40,10 +41,8 @@ public class Program
                 }
             }
 
-            action(currentVertex);
+            yield return currentVertex;
         }
-
-        return used;
     }
     public static List<List<int>> FindComponents(List<int>[] connections)
     {
@@ -64,7 +63,11 @@ public class Program
                 }
             }
 
-            used.UnionWith(DFS(connections, startingVertex, (int vertex) => { component.Add(vertex); }));
+            foreach (var vertex in DFS(connections, startingVertex))
+            {
+                used.Add(vertex);
+                component.Add(vertex);
+            }
 
             components.Add(component);
         }
@@ -103,7 +106,7 @@ public class Program
                     {
                         colors[connection] = colors[currentVertex] == 1 ? 2 : 1;
                     }
-                    if (colors[connection] != 0 && colors[connection] == colors[currentVertex])
+                    else if (colors[connection] != 0 && colors[connection] == colors[currentVertex])
                     {
                         return false;
                     }
@@ -120,6 +123,79 @@ public class Program
         return true;
     }
 
+    public static void A()
+    {
+        var inp = Console.ReadLine().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+        var n = int.Parse(inp[0]);
+        var s = int.Parse(inp[1]) - 1;
+
+        List<int>[] connections = new List<int>[n];
+
+        for (int i = 0; i < n; i++)
+        {
+            connections[i] = new List<int>();
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+            var connection = Console.ReadLine().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+            for (int j = 0; j < connection.Length; j++)
+            {
+                if (connection[j] == "1")
+                {
+                    connections[i].Add(j);
+                }
+            }
+        }
+
+        var count = -1;
+
+        foreach (var vertex in DFS(connections, s))
+        {
+            count++;
+        }
+
+        Console.WriteLine(count);
+    }
+    public static void B()
+    {
+        var inp = Console.ReadLine().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+        var n = int.Parse(inp[0]);
+        var k = int.Parse(inp[1]) - 1;
+
+        List<int>[] connections = new List<int>[n];
+
+        for (int i = 0; i < n; i++)
+        {
+            connections[i] = new List<int>();
+        }
+
+        for (int i = 0; ; i++)
+        {
+            var input = Console.ReadLine();
+            var connection = input.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (connection[0] == "0")
+            {
+                break;
+            }
+
+            var first = int.Parse(connection[0]) - 1;
+            var second = int.Parse(connection[1]) - 1;
+
+            connections[first].Add(second);
+        }
+
+        var count = -1;
+
+        foreach (var vertex in DFS(connections, k))
+        {
+            count++;
+        }
+
+        Console.WriteLine((count == n - 1) ? "Yes" : "No");
+    }
     public static void D()
     {
         var inp = Console.ReadLine().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
@@ -188,6 +264,6 @@ public class Program
     }
     public static void Main(string[] args)
     {
-
+        B();
     }
 }
