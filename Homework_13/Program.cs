@@ -122,6 +122,39 @@ public class Program
 
         return true;
     }
+    public static bool IsTree(List<int>[] connections)
+    {
+        var used = new HashSet<int>();
+        var suspended = new Stack<int>();
+        var connectionsCount = 0;
+
+        foreach (var vertex in connections)
+        {
+            foreach (var connection in vertex)
+            {
+                connectionsCount++;
+            }
+        }
+
+        suspended.Push(0);
+        used.Add(0);
+
+        while (suspended.Count > 0)
+        {
+            var currentVertex = suspended.Pop();
+
+            foreach (var connection in connections[currentVertex])
+            {
+                if (!used.Contains(connection))
+                {
+                    suspended.Push(connection);
+                    used.Add(connection);
+                }
+            }
+        }
+
+        return (connectionsCount / 2 == connections.Length - 1) && (used.Count == connections.Length);
+    }
 
     public static void A()
     {
@@ -196,6 +229,32 @@ public class Program
 
         Console.WriteLine((count == n - 1) ? "Yes" : "No");
     }
+    public static void C()
+    {
+        var n = int.Parse(Console.ReadLine());
+
+        List<int>[] connections = new List<int>[n];
+
+        for (int i = 0; i < n; i++)
+        {
+            connections[i] = new List<int>();
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+            var connection = Console.ReadLine().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+            for (int j = 0; j < connection.Length; j++)
+            {
+                if (connection[j] == "1")
+                {
+                    connections[i].Add(j);
+                }
+            }
+        }
+
+        Console.WriteLine(IsTree(connections) ? "YES" : "NO");
+    }
     public static void D()
     {
         var inp = Console.ReadLine().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
@@ -264,6 +323,6 @@ public class Program
     }
     public static void Main(string[] args)
     {
-        B();
+        C();
     }
 }
