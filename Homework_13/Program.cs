@@ -335,7 +335,7 @@ public class Program
 
         Console.WriteLine(IsSeparable(connections) ? "YES" : "NO");
     }
-    public static void E()
+    public static void E()// memory limit
     {
         var inp = Console.ReadLine().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
         var n = int.Parse(inp[0]);
@@ -375,7 +375,7 @@ public class Program
 
             Console.WriteLine(output);
         }
-    } // memory limit
+    }
     public static void F()
     {
         var inp = Console.ReadLine().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
