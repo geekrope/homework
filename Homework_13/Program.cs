@@ -320,9 +320,69 @@ public class Program
 
             Console.WriteLine(output);
         }
-    }
+    } // memory limit
+    public static void F()
+    {
+        var inp = Console.ReadLine().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+        var n = int.Parse(inp[0]);
+        var m = int.Parse(inp[1]);
+        var matrix = new bool[n, m];
+        var dots = 0;
+
+        List<int>[] connections = new List<int>[n * m];
+
+        for (int i = 0; i < n * m; i++)
+        {
+            connections[i] = new List<int>();
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+            var remains = Console.ReadLine();
+
+            for (int j = 0; j < remains.Length; j++)
+            {
+                if (remains[j] == '#')
+                {
+                    matrix[i, j] = true;
+                }
+                else
+                {
+                    dots++;
+                }
+            }
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
+                if (matrix[i, j])
+                {
+                    if (i - 1 >= 0 && matrix[i - 1, j])
+                    {
+                        connections[i * m + j].Add((i - 1) * m + j);
+                    }
+                    if (j - 1 >= 0 && matrix[i, j - 1])
+                    {
+                        connections[i * m + j].Add(i * m + j - 1);
+                    }
+                    if (i + 1 < n && matrix[i + 1, j])
+                    {
+                        connections[i * m + j].Add((i + 1) * m + j);
+                    }
+                    if (j + 1 < m && matrix[i, j + 1])
+                    {
+                        connections[i * m + j].Add(i * m + j + 1);
+                    }
+                }
+            }
+        }
+
+        Console.WriteLine(FindComponents(connections).Count - dots);
+    } // time limit
     public static void Main(string[] args)
     {
-        C();
+        F();
     }
 }
