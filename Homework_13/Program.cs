@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 public class Program
 {
@@ -44,6 +45,30 @@ public class Program
             yield return currentVertex;
         }
     }
+    public static IEnumerable<int> DFS(Dictionary<int, List<int>> connections, int startingVertex)
+    {
+        var used = new HashSet<int>();
+        var suspended = new Stack<int>();
+
+        suspended.Push(startingVertex);
+        used.Add(startingVertex);
+
+        while (suspended.Count > 0)
+        {
+            var currentVertex = suspended.Pop();
+
+            foreach (var connection in connections[currentVertex])
+            {
+                if (!used.Contains(connection))
+                {
+                    suspended.Push(connection);
+                    used.Add(connection);
+                }
+            }
+
+            yield return currentVertex;
+        }
+    }
     public static List<List<int>> FindComponents(List<int>[] connections)
     {
         HashSet<int> used = new HashSet<int>();
@@ -59,6 +84,36 @@ public class Program
                 if (!used.Contains(i))
                 {
                     startingVertex = i;
+                    break;
+                }
+            }
+
+            foreach (var vertex in DFS(connections, startingVertex))
+            {
+                used.Add(vertex);
+                component.Add(vertex);
+            }
+
+            components.Add(component);
+        }
+
+        return components;
+    }
+    public static List<List<int>> FindComponents(Dictionary<int, List<int>> connections)
+    {
+        HashSet<int> used = new HashSet<int>();
+        List<List<int>> components = new List<List<int>>();
+
+        while (used.Count != connections.Count)
+        {
+            var component = new List<int>();
+            var startingVertex = -1;
+
+            foreach (var vertex in connections)
+            {
+                if (!used.Contains(vertex.Key))
+                {
+                    startingVertex = vertex.Key;
                     break;
                 }
             }
@@ -326,61 +381,47 @@ public class Program
         var inp = Console.ReadLine().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
         var n = int.Parse(inp[0]);
         var m = int.Parse(inp[1]);
-        var matrix = new bool[n, m];
-        var dots = 0;
+        var matrix = new string[n];
 
-        List<int>[] connections = new List<int>[n * m];
-
-        for (int i = 0; i < n * m; i++)
-        {
-            connections[i] = new List<int>();
-        }
+        Dictionary<int, List<int>> connections = new Dictionary<int, List<int>>();
 
         for (int i = 0; i < n; i++)
         {
-            var remains = Console.ReadLine();
+            matrix[i] = Console.ReadLine();
 
-            for (int j = 0; j < remains.Length; j++)
+            for (int j = 0; j < matrix[i].Length; j++)
             {
-                if (remains[j] == '#')
+                if (matrix[i][j] == '#')
                 {
-                    matrix[i, j] = true;
-                }
-                else
-                {
-                    dots++;
+                    connections.Add(i * m + j, new List<int>());
                 }
             }
         }
 
-        for (int i = 0; i < n; i++)
+        foreach (var vert in connections.Keys)
         {
-            for (int j = 0; j < m; j++)
+            var i = vert / m;
+            var j = vert % m;
+            if (i - 1 >= 0 && matrix[i - 1][j] == '#')
             {
-                if (matrix[i, j])
-                {
-                    if (i - 1 >= 0 && matrix[i - 1, j])
-                    {
-                        connections[i * m + j].Add((i - 1) * m + j);
-                    }
-                    if (j - 1 >= 0 && matrix[i, j - 1])
-                    {
-                        connections[i * m + j].Add(i * m + j - 1);
-                    }
-                    if (i + 1 < n && matrix[i + 1, j])
-                    {
-                        connections[i * m + j].Add((i + 1) * m + j);
-                    }
-                    if (j + 1 < m && matrix[i, j + 1])
-                    {
-                        connections[i * m + j].Add(i * m + j + 1);
-                    }
-                }
+                connections[i * m + j].Add((i - 1) * m + j);
+            }
+            if (j - 1 >= 0 && matrix[i][j - 1] == '#')
+            {
+                connections[i * m + j].Add(i * m + j - 1);
+            }
+            if (i + 1 < n && matrix[i + 1][j] == '#')
+            {
+                connections[i * m + j].Add((i + 1) * m + j);
+            }
+            if (j + 1 < m && matrix[i][j + 1] == '#')
+            {
+                connections[i * m + j].Add(i * m + j + 1);
             }
         }
 
-        Console.WriteLine(FindComponents(connections).Count - dots);
-    } // time limit
+        Console.WriteLine(FindComponents(connections).Count);
+    }
     public static void Main(string[] args)
     {
         F();
