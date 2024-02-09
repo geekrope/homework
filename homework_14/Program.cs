@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.ConstrainedExecution;
 
 public struct Point
 {
@@ -40,16 +38,21 @@ public class Program
             yield return currentVertex;
         }
     }
-    public static bool IsSeparable(List<int>[] connections, out int[] res)
+
+
+    // RADIO https://acmp.ru/asp/do/index.asp?main=task&id_course=2&id_section=21&id_topic=50&id_problem=642
+    // memory limit exceeded
+    public static bool FrequencesInterfere(Point[] vertices, double distance, out int[] frequences)
     {
-        int[] colors = new int[connections.Length];
+        int[] colors = new int[vertices.Length];
         var used = new HashSet<int>();
         var suspended = new Stack<int>();
 
-        while (used.Count < connections.Length)
+        while (used.Count < vertices.Length)
         {
             var startingVertex = -1;
-            for (int i = 0; i < connections.Length; i++)
+
+            for (int i = 0; i < vertices.Length; i++)
             {
                 if (!used.Contains(i))
                 {
@@ -66,60 +69,36 @@ public class Program
             {
                 var currentVertex = suspended.Pop();
 
-                foreach (var connection in connections[currentVertex])
+                for (int connection = 0; connection < vertices.Length; connection++)
                 {
-                    if (colors[connection] == 0)
-                    {
-                        colors[connection] = colors[currentVertex] == 1 ? 2 : 1;
-                    }
-                    else if (colors[connection] != 0 && colors[connection] == colors[currentVertex])
-                    {
-                        res = new int[0] { };
-                        return false;
-                    }
+                    double dx = vertices[currentVertex].x - vertices[connection].x;
+                    double dy = vertices[currentVertex].y - vertices[connection].y;
+                    double currentDistance = Math.Sqrt(dx * dx + dy * dy);
 
-                    if (!used.Contains(connection))
+                    if (currentDistance <= distance * 2 && connection != currentVertex)
                     {
-                        suspended.Push(connection);
-                        used.Add(connection);
+                        if (colors[connection] == 0)
+                        {
+                            colors[connection] = colors[currentVertex] == 1 ? 2 : 1;
+                        }
+                        else if (colors[connection] != 0 && colors[connection] == colors[currentVertex])
+                        {
+                            frequences = new int[0] { };
+                            return false;
+                        }
+
+                        if (!used.Contains(connection))
+                        {
+                            suspended.Push(connection);
+                            used.Add(connection);
+                        }
                     }
                 }
             }
         }
 
-        res = colors;
+        frequences = colors;
         return true;
-    }
-
-    // RADIO https://acmp.ru/asp/do/index.asp?main=task&id_course=2&id_section=21&id_topic=50&id_problem=642
-    // memory limit exceeded
-    public static List<int>[] ConnectVerticesWithinDistance(Point[] vertices, double distance)
-    {
-        var length = vertices.Length;
-        var connections = new List<int>[length];
-
-        for (int i = 0; i < length; i++)
-        {
-            connections[i] = new List<int>();
-        }
-
-        for (int i = 0; i < length; i++)
-        {
-            for (int j = 0; j < length; j++)
-            {
-                double dx = vertices[j].x - vertices[i].x;
-                double dy = vertices[j].y - vertices[i].y;
-                double currentDistance = Math.Sqrt(dx * dx + dy * dy);
-
-                if (currentDistance < distance * 2 && i != j)
-                {
-                    connections[i].Add(j);
-                    connections[j].Add(i);
-                }
-            }
-        }
-
-        return connections;
     }
     public static void Radio()
     {
@@ -136,14 +115,14 @@ public class Program
         }
 
         double left = 0;
-        double right = 1e9;
-        int[] colors = new int[0] { };
+        double right = 1e7;
+        int[] frequences = new int[0] { };
 
         while (right - left > 1e-8)
         {
             var cur = (right + left) / 2;
 
-            if (IsSeparable(ConnectVerticesWithinDistance(vertices, cur), out colors))
+            if (FrequencesInterfere(vertices, cur, out frequences))
             {
                 left = cur;
             }
@@ -153,15 +132,17 @@ public class Program
             }
         }
 
-        IsSeparable(ConnectVerticesWithinDistance(vertices, left), out colors);
+        FrequencesInterfere(vertices, left, out frequences);
 
         Console.WriteLine(left.ToString(System.Globalization.CultureInfo.InvariantCulture));
-        var o = "";
-        foreach (var color in colors)
+        
+        var output = "";
+        foreach (var frequency in frequences)
         {
-            o += color + " ";
+            output += frequency + " ";
         }
-        Console.WriteLine(o);
+
+        Console.WriteLine(output);
     }
 
     public static void Main(string[] args)
