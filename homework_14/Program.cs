@@ -14,34 +14,7 @@ public struct Point
 
 public class Program
 {
-    public static IEnumerable<int> DFS(List<int>[] connections, int startingVertex)
-    {
-        var used = new HashSet<int>();
-        var suspended = new Stack<int>();
-
-        suspended.Push(startingVertex);
-        used.Add(startingVertex);
-
-        while (suspended.Count > 0)
-        {
-            var currentVertex = suspended.Pop();
-
-            foreach (var connection in connections[currentVertex])
-            {
-                if (!used.Contains(connection))
-                {
-                    suspended.Push(connection);
-                    used.Add(connection);
-                }
-            }
-
-            yield return currentVertex;
-        }
-    }
-
-
     // RADIO https://acmp.ru/asp/do/index.asp?main=task&id_course=2&id_section=21&id_topic=50&id_problem=642
-    // memory limit exceeded
     public static bool FrequencesInterfere(Point[] vertices, double distance, out int[] frequences)
     {
         int[] colors = new int[vertices.Length];
@@ -115,7 +88,7 @@ public class Program
         }
 
         double left = 0;
-        double right = 1e7;
+        double right = 1e9;
         int[] frequences = new int[0] { };
 
         while (right - left > 1e-8)
@@ -135,7 +108,7 @@ public class Program
         FrequencesInterfere(vertices, left, out frequences);
 
         Console.WriteLine(left.ToString(System.Globalization.CultureInfo.InvariantCulture));
-        
+
         var output = "";
         foreach (var frequency in frequences)
         {
