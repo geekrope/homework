@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 public class Program
@@ -35,25 +34,19 @@ public class Program
 
         return routes;
     }
-    public static IEnumerable<int> BFSC(int startingNumber, int target)
+    public static List<int> BFSC(int startingNumber, int target)
     {
-        Dictionary<int, int> routes = new Dictionary<int, int>();
-        Dictionary<int, int> ancestors = new Dictionary<int, int>();
+        Dictionary<int, int> parents = new Dictionary<int, int>();
         Queue<int> suspended = new Queue<int>();
 
         suspended.Enqueue(startingNumber);
-        routes.Add(startingNumber, 0);
 
-        while (!routes.ContainsKey(target))
+        while (!parents.ContainsKey(target))
         {
             var currentNumber = suspended.Dequeue();
 
-            if (!routes.ContainsKey(currentNumber))
-            {
-                routes.Add(currentNumber, routes[ancestors[currentNumber]] + 1);
-            }
-
             var furtherNumbers = new List<int>() { (currentNumber % 1000) * 10 + currentNumber / 1000, (currentNumber % 10) * 1000 + currentNumber / 10 };
+
             if (currentNumber / 1000 != 9)
             {
                 furtherNumbers.Add(currentNumber + 1000);
@@ -65,30 +58,27 @@ public class Program
 
             foreach (var further in furtherNumbers)
             {
-                if (!ancestors.ContainsKey(further))
+                if (!parents.ContainsKey(further))
                 {
-                    ancestors.Add(further, further);
+                    parents[further] = currentNumber;
                     suspended.Enqueue(further);
                 }
             }
         }
 
-        var route = new Stack<int>();
-        var currentRouteNode = target;
+        var route = new List<int>();
+        var currentNode = target;
+        route.Add(currentNode);
 
-        route.Push(target);
-
-        while (currentRouteNode != startingNumber)
+        while (route[route.Count - 1] != startingNumber)
         {
-            var previous = ancestors[currentRouteNode];
-            route.Push(previous);
-            currentRouteNode = previous;
+            currentNode = parents[currentNode];
+            route.Add(currentNode);
         }
 
-        while (route.Count > 0)
-        {
-            yield return route.Pop();
-        }
+        route.Reverse();
+
+        return route;
     }
 
     //https://acmp.ru/asp/do/index.asp?main=task&id_course=2&id_section=21&id_topic=51&id_problem=649
@@ -123,15 +113,69 @@ public class Program
 
         Console.WriteLine(routes[secondTargeted]);
     }
+    //https://acmp.ru/asp/do/index.asp?main=task&id_course=2&id_section=21&id_topic=51&id_problem=655
+    public static void B()
+    {
+        var aliasing = new List<string>();
 
-    public static void Main(string[] args)
+        var m = int.Parse(Console.ReadLine());
+        var morphList = new List<int>[m];
+
+        for (int i = 0; i < m; i++)
+        {
+            morphList[i] = new List<int>();
+        }
+
+        for (int i = 0; i < m; i++)
+        {
+            var morph = Console.ReadLine().Replace(" ", "").Split(new string[] { "->" }, StringSplitOptions.RemoveEmptyEntries);
+            var firstSubstance = morph[0];
+            var secondSubstance = morph[1];
+
+            var firstIndex = aliasing.IndexOf(firstSubstance);
+            var secondIndex = aliasing.IndexOf(secondSubstance);
+
+            if (firstIndex == -1)
+            {
+                aliasing.Add(firstSubstance);
+                firstIndex = aliasing.Count - 1;
+            }
+            if (secondIndex == -1)
+            {
+                aliasing.Add(secondSubstance);
+                secondIndex = aliasing.Count - 1;
+            }
+
+            morphList[firstIndex].Add(secondIndex);
+            morphList[secondIndex].Add(firstIndex);
+        }
+
+        var firstMorthSubstance = aliasing.IndexOf(Console.ReadLine());
+        var secondMorthSubstance = aliasing.IndexOf(Console.ReadLine());
+
+        if (firstMorthSubstance == -1 || secondMorthSubstance == -1)
+        {
+            Console.WriteLine(-1);
+        }
+        else
+        {
+            Console.WriteLine(BFS(morphList, firstMorthSubstance)[secondMorthSubstance]);
+        }
+    }
+    //https://acmp.ru/asp/do/index.asp?main=task&id_course=2&id_section=21&id_topic=51&id_problem=1015
+    public static void C()
     {
         var first = int.Parse(Console.ReadLine());
         var second = int.Parse(Console.ReadLine());
 
-        foreach(var node in BFSC(first, second))
+        foreach (var node in BFSC(first, second))
         {
             Console.WriteLine(node);
         }
+    }
+
+    public static void Main(string[] args)
+    {
+        B();
     }
 }
