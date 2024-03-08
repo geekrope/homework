@@ -1,91 +1,98 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
+using System.Reflection.PortableExecutable;
+using static Program;
 
 public class Program
 {
+    public enum TokenType
+    {
+        openBracket, closeBracket, slash, letter, ending, none
+    }
+    public static TokenType GetTokenType(char character)
+    {
+        var tokenType = TokenType.none;
+        switch (character)
+        {
+            case '<':
+                return TokenType.openBracket;
+            case '>':
+                return TokenType.closeBracket;
+            case '/':
+                return TokenType.slash;
+            default:
+                if (char.IsLetter(character))
+                {
+                    return TokenType.letter;
+                }
+
+                return TokenType.none;
+        }
+
+        return tokenType;
+    }
     public static bool Validate(string xml)
     {
         Stack<string> openingTags = new Stack<string>();
         var openingTag = true;
-        var openedTag = false;
         var tagName = "";
 
-        for (int index = 0; index < xml.Length;)
+        var expectedTokens = new TokenType[] { TokenType.openBracket };
+
+        for (int index = 0; index < xml.Length; index++)
         {
             var character = xml[index];
+            var tokenType = GetTokenType(character);
 
-            if (character == '<')
-            {
-                if (index + 1 >= xml.Length)
-                {
-                    return false;
-                }
-                if (xml[index + 1] == '/')
-                {
-                    openingTag = false;
-                    index += 2;
-                }
-                else
-                {
-                    index++;
-                }
-
-                openedTag = true;
-            }
-            else if (!openedTag && character != '<')
+            if (Array.IndexOf(expectedTokens, tokenType) == -1)
             {
                 return false;
             }
-            else if (character == '>')
-            {
-                if (tagName == "")
-                {
-                    return false;
-                }
 
-                if (openingTag)
-                {
-                    openingTags.Push(tagName);
-                }
-                else if (!openingTag)
-                {
-                    if (openingTags.Count == 0)
+            switch (tokenType)
+            {
+                case TokenType.openBracket:
+                    expectedTokens = new TokenType[] { TokenType.slash, TokenType.letter };
+                    openingTag = true;
+                    tagName = "";
+                    break;
+                case TokenType.closeBracket:
+                    expectedTokens = new TokenType[] { TokenType.openBracket, TokenType.ending };
+                    if (openingTag)
                     {
-                        return false;
-                    }
-                    else if (tagName != openingTags.Peek())
-                    {
-                        return false;
+                        openingTags.Push(tagName);
                     }
                     else
                     {
-                        openingTags.Pop();
+                        if (openingTags.Count == 0 || openingTags.Pop() != tagName)
+                        {
+                            return false;
+                        }
                     }
-                }
+                    break;
+                case TokenType.slash:
+                    expectedTokens = new TokenType[] { TokenType.letter
+};
+                    openingTag = false;
+                    break;
+                case TokenType.letter:
+                    expectedTokens = new TokenType[] { TokenType.letter, TokenType.closeBracket };
+                    tagName += character;
+                    break;
+                default:
+                    return false;
+            }
+        }
 
-                tagName = "";
-                openingTag = true;
-                openedTag = false;
-
-                index++;
-            }
-            else if (char.IsLetter(character))
-            {
-                tagName += character;
-                index++;
-            }
-            else
-            {
-                return false;
-            }
+        if (Array.IndexOf(expectedTokens, TokenType.ending) == -1)
+        {
+            return false;
         }
 
         return openingTags.Count == 0;
     }
-    public static void A() //Wrong answer 16
+    public static void A()
     {
         var input = Console.ReadLine();
         var possibleCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ<>/".ToLower();
@@ -173,6 +180,7 @@ public class Program
     }
     public static void Main(string[] args)
     {
-        B();
+        //Console.WriteLine(Validate(Console.ReadLine()));
+        A();
     }
 }
